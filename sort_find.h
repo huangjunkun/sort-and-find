@@ -55,7 +55,7 @@ bool g_load_flag = false;
 
 
 //---------------------------------------------------------------------------
-//起泡排序
+//冒泡排序
 void BubbleSort(SqList &L)
 {
     // 将a中整数序列重新排列成自小至大有序的整数序列(起泡排序)
@@ -178,7 +178,7 @@ void QuickSort(SqList &L)
 }
 
 // 对顺序表L作归并排序。方法一！！！
-/*
+//*
  void Merge(RedType* &SR,RedType* &TR,long i,long m,long n)
  { // 将有序的SR[i..m]和SR[m+1..n]归并为有序的TR[i..n]
    //int j,k,l;
@@ -231,7 +231,6 @@ void QuickSort(SqList &L)
 		delete[] TR2;
 	}
 	++g_sort_comp_count;
-	//		cout << "	Hello	";
 
  }
 
@@ -239,12 +238,11 @@ void QuickSort(SqList &L)
  { // 对顺序表L作归并排序。
 	 MSort(L.data,L.data,1,L.length);
  }
-*/
+
 //---------------------------------------------------------------------------
-// 对顺序表L作归并排序。方法二、、、
+// 对顺序表L作归并排序。方法二
 //************合并排序******************************
-//比较高效！！！！
-void   Merge(SqList  &L1, SqList  &L2, SqList  &L)
+void   Merge2(SqList  &L1, SqList  &L2, SqList  &L)
 {
     long   i=1,j=1,k=1;
     while ( i<=L1.length && j<=L2.length )
@@ -276,7 +274,7 @@ void   Merge(SqList  &L1, SqList  &L2, SqList  &L)
             ++g_sort_assgin_count;
         }
 }
-void   MergeSort(SqList  &L)
+void   MergeSort2(SqList  &L)
 {
     long   i,j;
     SqList  L1,L2;
@@ -600,5 +598,69 @@ bool InterpolationFind(const SqList &L,  RedType& g_search_data )
     return false;
 }
 //---------------------------------------------------------------------------
+
+/// 基数排序 ///
+//(radix sort）则是属于“分配式排序”（distribution sort），基数排序法又称“桶子法”（bucket sort）或bin sort，顾名思义，它是透过键值的部份资讯，
+// 将要排序的元素分配至某些“桶”中，藉以达到排序的作用，基数排序法是属于稳定性的排序，其时间复杂度为O (nlog(r)m)，
+// 其中r为所采取的基数，而m为堆数，在某些时候，基数排序法的效率高于其它的比较性排序法。
+
+/// 效率分析
+// 时间效率：设待排序列为n个记录，d个关键码，关键码的取值范围为radix，则进行链式基数排序的时间复杂度为O(d(n+radix))，
+// 其中，一趟分配时间复杂度为O(n)，一趟收集时间复杂度为O(n)，共进行d趟分配和收集。
+
+// 空间效率：需要2*radix个指向队列的辅助空间，以及用于静态链表的n个指针。
+
+/// 实现的方法
+//最高位优先(Most Significant Digit first)法，简称MSD法：先按k1排序分组，同一组中记录，关键码k1相等，再对各组按k2排序分成子组，
+//之后，对后面的关键码继续这样的排序分组，直到按最次位关键码kd对各子组排序后。再将各组连接起来，便得到一个有序序列。
+
+//最低位优先(Least Significant Digit first)法，简称LSD法：先从kd开始排序，再对kd-1进行排序，依次重复，直到对k1排序后便得到一个有序序列。
+
+
+/// 基数排序（LSD法）演示 ///
+int test_distribution_sort()
+{
+    const unsigned DATA_COUNT = 10;
+    int data[DATA_COUNT]= {73,22,93,43,55,14,28,65,39,81};
+	int max_data = 93;
+    int temp[DATA_COUNT][DATA_COUNT]= {0};
+    int order[DATA_COUNT]= {0};
+
+    printf("\n排序前: ");
+    for (int i=0; i<10; ++i)
+        printf("%d ",data[i]);
+    putchar('\n');
+
+    for (int n = 1; n <= max_data; n *= 10)
+    {
+        for (int i=0; i<10; ++i)
+        {
+            int lsd=((data[i]/n)%10);
+            temp[lsd][order[lsd]]=data[i];
+            ++order[lsd];
+        }
+        printf("\n重新排列: ");
+        int k = 0;
+        for (int i=0; i<10; ++i)
+        {
+            if(order[i]!=0)
+                for (int j=0; j<order[i]; ++j)
+                {
+                    data[k]=temp[i][j];
+                    printf("%d ",data[k]);
+                    k++;
+                }
+            order[i]=0;
+        }
+    }
+    putchar('\n');
+    printf("\n排序后: ");
+    for (int i=0; i<10; i++)
+        printf("%d ",data[i]);
+
+    putchar('\n');
+    return 0;
+
+}
 
 #endif /// __SORT_FIND_H_

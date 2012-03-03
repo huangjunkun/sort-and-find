@@ -1,0 +1,100 @@
+Title:
+	[stl-stable_sort源码学习笔记]
+	===== begin =====
+ STL算法 （稳定）在位排序
+ stable_sort(__first,  __last) {
+ // 关键点1：申请排序缓冲区
+  _Temporary_buffer<_RandomAccessIter, _Tp> buf(__first, __last);
+  if (buf.begin() == 0)
+    __inplace_stable_sort(__first, __last);//若缓冲区为空则内部排序。
+  else 
+    __stable_sort_adaptive(__first, __last, buf.begin(),
+                           _Distance(buf.size()));//转调					
+}
+	=====>>>>>
+	转调的在位排序，实则归并排序。
+__stable_sort_adaptive(__first, __last, __buffer,__buffer_size) {
+	// 关键点2：递归，归并排序！
+  __len = (__last - __first + 1) / 2;
+  __middle = __first + __len;
+  if (__len > __buffer_size) {
+    __stable_sort_adaptive(__first, __middle, __buffer, __buffer_size);
+    __stable_sort_adaptive(__middle, __last, __buffer, __buffer_size);
+  }
+  else {
+    __merge_sort_with_buffer(__first, __middle, __buffer, (_Distance*)0);
+    __merge_sort_with_buffer(__middle, __last, __buffer, (_Distance*)0);
+  }
+  __merge_adaptive(__first, __middle, __last, _Distance(__middle - __first), 
+                   _Distance(__last - __middle), __buffer, __buffer_size);
+}
+	=====>>>>>
+	借助缓冲区进行归并排序
+__merge_sort_with_buffer(__first, __last, __buffer) {
+  __len = __last - __first;
+  __buffer_last = __buffer + __len;
+  __step_size = __stl_chunk_size;// sgi stl 7
+  // 关键点3：在整个集合分片地进行插入排序，保证每分片均有序。
+  __chunk_insertion_sort(__first, __last, __step_size);
+  // 关键点4：合并不同分片（有序的）元素。
+  while (__step_size < __len) {
+    __merge_sort_loop(__first, __last, __buffer, __step_size);
+    __step_size *= 2;
+    __merge_sort_loop(__buffer, __buffer_last, __first, __step_size);
+    __step_size *= 2;
+  }
+}
+	=====>>>>>	
+__merge_sort_loop(__first,  __last, __result, __step_size) {
+  __two_step = 2 * __step_size;
+  while (__last - __first >= __two_step) {
+    __result = merge(__first, __first + __step_size,
+                     __first + __step_size, __first + __two_step,
+                     __result);
+    __first += __two_step;
+  }
+
+  __step_size = min((__last - __first), __step_size);
+  merge(__first, __first + __step_size, __first + __step_size, __last,
+        __result);
+}
+	=====>>>>>
+	将集合切分若干分片，排序每分片元素。
+__chunk_insertion_sort(__first, __last, __chunk_size)
+{
+  while (__last - __first >= __chunk_size) {
+    __insertion_sort(__first, __first + __chunk_size);
+    __first += __chunk_size;
+  }
+  __insertion_sort(__first, __last);
+}
+	=====>>>>>
+	插入排序
+__insertion_sort(__first, __last) { 
+  for (__i = __first + 1; __i != __last; ++__i)
+    __linear_insert(__first, __i, __VALUE_TYPE(__first));
+}
+	=====>>>>>
+__linear_insert( __first, __last, _Tp*) {
+  if (__val < *__first) {
+    copy_backward(__first, __last, __last + 1);
+    *__first = __val;
+  }
+  else
+    __unguarded_linear_insert(__last, __val);
+}
+	=====>>>>>
+__unguarded_linear_insert(__last, __val) {
+  __next = __last;
+  --__next;
+  while (__val < *__next) {
+    *__last = *__next;
+    __last = __next;
+    --__next;
+  }
+  *__last = __val;
+}
+	===== end =====
+	
+	
+	@huangjunkun/2011-11-01/

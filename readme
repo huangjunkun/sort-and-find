@@ -6,8 +6,39 @@
 ** declare: 
   目录存放大学时期，学习数据结构（算法）时做实验题目的代码，代码非工程性，用于学习和测试，仅包括排序与查找算法。
   源文件简要说明，如下：
-
+  
+  # 排序算法：
+	冒泡排序	--	BubbleSort
+	选择排序	--	SelectSort
+	快速排序	--	QuickSort
+	归并排序	--	MergeSort
+				--	MergeSort2
+	插入排序	--	InsertSort（简单插入排序）
+				--	BInsertSort（折半插入排序）
+				--	P2InsertSort（2路插入排序）
+	堆排序		--	HeapSort
+	希尔排序	--	ShellSort
+	基数排序	--	test_distribution_sort（演示）
 	
+	## 时间复杂度
+	冒泡排序 O(n2)
+	插入排序 O(n2)
+	选择排序 O(n2)
+	归并排序 O(n log n)
+	堆排序 O(n log n)
+	快速排序 O(n log n)
+	希尔排序 O(n1.25)
+	基数排序 O(n)
+	
+	排序算法详细说明参见：http://zh.wikipedia.org/zh/%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95
+	
+  查找算法
+	顺序查找	--	SequentialFind
+	折半查找	--	BinaryFind
+	插值查找	--	InterpolationFind
+	注意：折半与插值查找，适用于针对有序集合的查找。
+	
+
 	
 	
 **/
