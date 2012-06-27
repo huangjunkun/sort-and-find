@@ -85,6 +85,7 @@ int DistributionCountingSort(int iArray[], size_t nCount, int iMin, int iMax, in
         iResult[elementStat[j] - 1] = iArray[i];
         elementStat[j] -= 1;
     }
+    delete [] elementStat;
     return 0;
 }
 
